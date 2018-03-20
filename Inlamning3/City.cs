@@ -19,14 +19,14 @@ namespace Inlamning3
 
 
         public City(string cityName, int cityPopulationNumber, int cityPopulationAvrageIncome, int cityTouristNumberPerYear,
-            List<Accommodation> cityAccommodation, int cityAccommodationCount, double cityAvrageCoust)
+            List<Accommodation> cityAccommodation, double cityAvrageCoust)
         {
             name = cityName;
             populationNumber = cityPopulationNumber;
             populationAvrageIncome = cityPopulationAvrageIncome;
             touristNumberPerYear = cityTouristNumberPerYear;
             accommodation = cityAccommodation;
-            accommodationCount = cityAccommodationCount;
+            accommodationCount = cityAccommodation.Count();
             avrageCoust = cityAvrageCoust;
         }
 

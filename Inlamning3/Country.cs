@@ -13,13 +13,12 @@ namespace Inlamning3
         private int bnp;
         List<City> cities = new List<City> { };
 
-        public Country(string countryNamn, int countryPopulationNumber, int countryBnp, List<City> countryCities)
+        public Country(string countryNamn, int countryPopulationNumber, int countryBnp, City city)
         {
-            cities = countryCities;
             name = countryNamn;
             populationNumber = countryPopulationNumber;
             bnp = countryBnp;
-            
+            cities.Add(city);
         }
 
         public string Name
