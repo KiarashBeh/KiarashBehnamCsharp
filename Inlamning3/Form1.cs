@@ -16,8 +16,8 @@ namespace Inlamning3
     {
         SqlConnection myConnection = new SqlConnection();
         private City cityVal, BarcelonaX, AmsterdamX, BostonX;
-        List<Accommodation> skatter;
-        int choice = 10000;
+        List<Accommodation> skatter, histo;
+        int choice = 10000, minChoice = 0;
         string itm;
 
         public Form1()
@@ -112,8 +112,13 @@ namespace Inlamning3
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out choice);
-            if (choice>20) 
-                SkatterPlot() ;
+            if (choice > 50)
+            {
+                SkatterPlot();
+                HistogramPlot();
+            }
+            else
+                choice = 5000;
         }
 
         private void chart2_Click(object sender, EventArgs e)
@@ -121,21 +126,38 @@ namespace Inlamning3
 
         }
 
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(textBox2.Text, out minChoice);
+            if (minChoice > 0 && minChoice< choice-100)
+            {
+                SkatterPlot();
+                HistogramPlot();
+            }
+            else
+                minChoice = 0;
+
+        }
+
         private void SkatterPlot()
         {
-
+            
             if (itm == "Barcelona")
                 cityVal = BarcelonaX; //-----------Change of cityval
             else if (itm == "Amsterdam")
                 cityVal = AmsterdamX;
             else
                 cityVal = BostonX;
-            
+
+            if (minChoice > 0 && minChoice > choice - 100)
+            {
+                minChoice = 0;
+            }
 
             skatter = cityVal.Accommodation;
                         
             var dataPoints = from line in skatter
-                             where line.OverallSatisfaction < 4.5 && line.Price < choice
+                             where line.OverallSatisfaction < 4.5 && line.Price < choice && line.Price > minChoice
                              select new {line.OverallSatisfaction, line.Price};
 
             string s = "Series1";
@@ -148,23 +170,58 @@ namespace Inlamning3
 
             chart1.Series["Series1"].ChartType = SeriesChartType.Point;
 
-            chart2.Series[s].Points.Clear();
-            foreach (var x in dataPoints)
-            {
-                chart2.Series[s].Points.AddXY(x.Price, x.OverallSatisfaction);
-            }
 
-            chart2.Series["Series1"].ChartType = SeriesChartType.Point;
 
         }
 
+        private void HistogramPlot()
+        {
+            if (itm == "Barcelona")
+                cityVal = BarcelonaX; //-----------Change of cityval
+            else if (itm == "Amsterdam")
+                cityVal = AmsterdamX;
+            else
+                cityVal = BostonX;
 
+            if (minChoice > 0 && minChoice > choice - 100)
+            {
+                minChoice = 0;
+            }
+                
+
+
+            histo = cityVal.Accommodation;
+
+            var histogram = from line in histo
+                            where line.Price < choice && line.Price > minChoice && line.RoomType == "Private room" 
+                            select line;
+
+            var query = from r in histogram
+                        group r by r.Price - (r.Price % 10) into r
+                        select new
+                        {
+                            Range = r.Key,
+                            Count = r.Count()
+                        };
+
+
+            chart2.Series["Series1"].Points.Clear();
+            foreach (var x in query)
+            {
+                chart2.Series["Series1"].Points.AddXY(x.Range, x.Count);
+            }
+
+            //chart2.Series["Series1"].ChartType = SeriesChartType.Bar;
+
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             Creation();
             SkatterPlot();
-            
+            HistogramPlot();
+
+
             comboBox1.Items.Add("Amsterdam");
             comboBox1.Items.Add("Boston");
             comboBox1.Items.Add("Barcelona");
@@ -175,6 +232,7 @@ namespace Inlamning3
         {
             itm = comboBox1.SelectedItem.ToString();
             SkatterPlot();
+            HistogramPlot();
         }
     }
 }
